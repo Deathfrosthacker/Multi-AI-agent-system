@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentFlow — Multi-Agent AI Orchestration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div class="brand">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>AgentFlow</h1>
+                    <span class="subtitle">Multi-Agent AI Orchestration</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-ghost" id="btn-view-architecture">Architecture</button>
+                <a href="https://github.com" class="btn-ghost" target="_blank">GitHub</a>
+            </div>
+        </header>
+
+        <main class="main">
+            <aside class="sidebar">
+                <div class="panel">
+                    <h2>Mission Control</h2>
+                    <div class="form-group">
+                        <label for="task-input">Research Topic</label>
+                        <textarea id="task-input" rows="3" placeholder="e.g., Impact of quantum computing on cybersecurity in 2026"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Agent Framework</label>
+                        <div class="chip-group">
+                            <button class="chip active" data-framework="crewai">CrewAI</button>
+                            <button class="chip" data-framework="langgraph">LangGraph</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Model</label>
+                        <select id="model-select">
+                            <option value="gpt-4">GPT-4 (Simulated)</option>
+                            <option value="claude-3">Claude 3 (Simulated)</option>
+                            <option value="local">Local LLM (Simulated)</option>
+                        </select>
+                    </div>
+                    <button id="btn-run" class="btn-primary">
+                        <span class="btn-icon">▶</span> Deploy Agents
+                    </button>
+                    <button id="btn-reset" class="btn-secondary">Reset</button>
+                </div>
+
+                <div class="panel panel-dark">
+                    <h3>System Metrics</h3>
+                    <div class="metric">
+                        <span class="metric-label">Active Agents</span>
+                        <span class="metric-value" id="metric-agents">0/3</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Tasks Completed</span>
+                        <span class="metric-value" id="metric-tasks">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Tokens Used</span>
+                        <span class="metric-value" id="metric-tokens">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Latency</span>
+                        <span class="metric-value" id="metric-latency">0ms</span>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="viz-section">
+                <div class="viz-header">
+                    <h2>Agent Network</h2>
+                    <div class="legend">
+                        <span class="legend-item"><span class="dot idle"></span> Idle</span>
+                        <span class="legend-item"><span class="dot working"></span> Working</span>
+                        <span class="legend-item"><span class="dot done"></span> Done</span>
+                    </div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="network-canvas" width="800" height="500"></canvas>
+                    <div class="agent-card" id="agent-research" style="left: 15%; top: 30%;">
+                        <div class="agent-avatar">🔬</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Research Agent</div>
+                            <div class="agent-role">Data Gathering</div>
+                            <div class="agent-status">Idle</div>
+                        </div>
+                    </div>
+                    <div class="agent-card" id="agent-summarize" style="left: 50%; top: 15%;">
+                        <div class="agent-avatar">📝</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Summarize Agent</div>
+                            <div class="agent-role">Synthesis</div>
+                            <div class="agent-status">Idle</div>
+                        </div>
+                    </div>
+                    <div class="agent-card" id="agent-critic" style="left: 75%; top: 50%;">
+                        <div class="agent-avatar">🔍</div>
+                        <div class="agent-info">
+                            <div class="agent-name">Critic Agent</div>
+                            <div class="agent-role">Quality Assurance</div>
+                            <div class="agent-status">Idle</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar sidebar-right">
+                <div class="panel panel-console">
+                    <div class="console-header">
+                        <h3>Agent Logs</h3>
+                        <button class="btn-clear" id="btn-clear-logs">Clear</button>
+                    </div>
+                    <div class="console" id="console"></div>
+                </div>
+
+                <div class="panel">
+                    <h3>Final Output</h3>
+                    <div class="output-box" id="final-output">
+                        <p class="placeholder">Agent output will appear here...</p>
+                    </div>
+                    <div class="output-actions">
+                        <button class="btn-small" id="btn-copy-output">Copy</button>
+                        <button class="btn-small" id="btn-export-md">Export MD</button>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <section class="pipeline">
+            <div class="pipeline-step" id="step-research">
+                <div class="step-circle">1</div>
+                <div class="step-label">Research</div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-step" id="step-summarize">
+                <div class="step-circle">2</div>
+                <div class="step-label">Summarize</div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-step" id="step-critic">
+                <div class="step-circle">3</div>
+                <div class="step-label">Critique</div>
+            </div>
+            <div class="pipeline-connector"></div>
+            <div class="pipeline-step" id="step-final">
+                <div class="step-circle">✓</div>
+                <div class="step-label">Deliver</div>
+            </div>
+        </section>
+
+        <div class="modal" id="architecture-modal" aria-hidden="true">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" id="modal-close">&times;</button>
+                <h2>System Architecture</h2>
+                <div class="arch-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-box">User Input</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-box highlight">Orchestrator</div>
+                    </div>
+                    <div class="arch-layer agents">
+                        <div class="arch-box agent-research">Research Agent<br><small>Web Search • Analysis</small></div>
+                        <div class="arch-box agent-summarize">Summarize Agent<br><small>Compression • Synthesis</small></div>
+                        <div class="arch-box agent-critic">Critic Agent<br><small>Fact-Check • Review</small></div>
+                    </div>
+                    <div class="arch-layer">
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-box">Shared Memory / State</div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-box highlight">Final Output</div>
+                    </div>
+                </div>
+                <div class="arch-details">
+                    <h3>Tech Stack</h3>
+                    <ul>
+                        <li><strong>CrewAI</strong> — Role-based agent collaboration with tasks and tools</li>
+                        <li><strong>LangGraph</strong> — Stateful cyclic workflows with conditional edges</li>
+                        <li><strong>OpenAI/Anthropic APIs</strong> — LLM inference layer</li>
+                        <li><strong>FastAPI</strong> — Optional REST API wrapper</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Frontend runs entirely in browser. Backend requires Python + API keys. See /backend/ folder.</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
